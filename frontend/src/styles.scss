@@ -1,0 +1,29 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.mobile-friendly {
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+}
+
+.queue-item {
+  margin-bottom: 8px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.action-button {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}

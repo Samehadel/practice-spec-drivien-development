@@ -28,13 +28,13 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize Spring Boot project with Maven dependencies in backend/pom.xml
-- [ ] T003 Initialize Angular 17+ project with standalone components in frontend/
-- [ ] T004 [P] Configure backend linting with Checkstyle in backend/
-- [ ] T005 [P] Configure frontend linting with ESLint and Prettier in frontend/
-- [ ] T006 Setup Docker Compose for local development in docker-compose.yml
-- [ ] T007 [P] Configure Git pre-commit hooks for code formatting
+- [x] T001 Create project structure per implementation plan
+- [x] T002 Initialize Spring Boot project with Maven dependencies in backend/pom.xml
+- [x] T003 Initialize Angular 17+ project with standalone components in frontend/
+- [x] T004 [P] Configure backend linting with Checkstyle in backend/
+- [x] T005 [P] Configure frontend linting with ESLint and Prettier in frontend/
+- [x] T006 Setup Docker Compose for local development in docker-compose.yml
+- [x] T007 [P] Configure Git pre-commit hooks for code formatting
 
 ---
 
