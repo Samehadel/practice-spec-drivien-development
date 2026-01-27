@@ -1,0 +1,579 @@
+openapi: 3.0.3
+info:
+  title: WhatsApp Virtual Queue API
+  description: API for managing WhatsApp-based virtual queues
+  version: 1.0.0
+  contact:
+    name: WhatsApp Queue Team
+servers:
+  - url: https://api.whatsapp-queue.com/v1
+    description: Production server
+  - url: http://localhost:8080/v1
+    description: Development server
+
+paths:
+  /businesses:
+    get:
+      summary: List all businesses
+      operationId: listBusinesses
+      tags:
+        - Business Management
+      responses:
+        '200':
+          description: List of businesses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BusinessResponse'
+                  pagination:
+                    $ref: '#/components/schemas/PaginationInfo'
+
+    post:
+      summary: Create a new business
+      operationId: createBusiness
+      tags:
+        - Business Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBusinessRequest'
+      responses:
+        '201':
+          description: Business created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /businesses/{businessId}:
+    get:
+      summary: Get business by ID
+      operationId: getBusiness
+      tags:
+        - Business Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Business details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessResponse'
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update business
+      operationId: updateBusiness
+      tags:
+        - Business Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBusinessRequest'
+      responses:
+        '200':
+          description: Business updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessResponse'
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /businesses/{businessId}/queue:
+    get:
+      summary: Get current queue for business
+      operationId: getBusinessQueue
+      tags:
+        - Queue Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current queue state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  business:
+                    $ref: '#/components/schemas/BusinessResponse'
+                  queue:
+                    type: object
+                    properties:
+                      isOpen:
+                        type: boolean
+                      activeEntries:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/QueueEntryResponse'
+                      estimatedWaitTime:
+                        type: integer
+                        description: Estimated wait time in minutes for new customers
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /businesses/{businessId}/queue/advance:
+    post:
+      summary: Advance queue to next customer
+      operationId: advanceQueue
+      tags:
+        - Queue Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvanceQueueRequest'
+      responses:
+        '200':
+          description: Queue advanced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  servedEntry:
+                    $ref: '#/components/schemas/QueueEntryResponse'
+                  nextEntry:
+                    $ref: '#/components/schemas/QueueEntryResponse'
+                  queue:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QueueEntryResponse'
+        '400':
+          description: Cannot advance queue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /businesses/{businessId}/queue/skip:
+    post:
+      summary: Skip current customer
+      operationId: skipCurrentCustomer
+      tags:
+        - Queue Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkipCustomerRequest'
+      responses:
+        '200':
+          description: Customer skipped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skippedEntry:
+                    $ref: '#/components/schemas/QueueEntryResponse'
+                  nextEntry:
+                    $ref: '#/components/schemas/QueueEntryResponse'
+                  queue:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QueueEntryResponse'
+        '400':
+          description: Cannot skip customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /businesses/{businessId}/queue/status:
+    put:
+      summary: Open or close queue
+      operationId: updateQueueStatus
+      tags:
+        - Queue Management
+      parameters:
+        - name: businessId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQueueStatusRequest'
+      responses:
+        '200':
+          description: Queue status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessResponse'
+        '404':
+          description: Business not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/whatsapp:
+    post:
+      summary: WhatsApp webhook endpoint
+      operationId: handleWhatsAppWebhook
+      tags:
+        - WhatsApp Integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsAppWebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [processed, ignored]
+                  message:
+                    type: string
+        '400':
+          description: Invalid webhook data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    BusinessResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        serviceType:
+          type: string
+        whatsappPhoneNumber:
+          type: string
+        queueOpen:
+          type: boolean
+        averageServiceTimeMinutes:
+          type: integer
+          minimum: 1
+          maximum: 120
+        notificationThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateBusinessRequest:
+      type: object
+      required:
+        - name
+        - serviceType
+        - whatsappPhoneNumber
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        serviceType:
+          type: string
+          minLength: 1
+          maxLength: 100
+        whatsappPhoneNumber:
+          type: string
+          pattern: '^\+[1-9]\d{1,14}$'
+        averageServiceTimeMinutes:
+          type: integer
+          minimum: 1
+          maximum: 120
+          default: 10
+        notificationThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 3
+
+    UpdateBusinessRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        serviceType:
+          type: string
+          minLength: 1
+          maxLength: 100
+        averageServiceTimeMinutes:
+          type: integer
+          minimum: 1
+          maximum: 120
+        notificationThreshold:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    QueueEntryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        businessId:
+          type: string
+          format: uuid
+        whatsappIdentifier:
+          type: string
+        customerName:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, SERVED, NO_SHOW, LEFT]
+        joinedAt:
+          type: string
+          format: date-time
+        servedAt:
+          type: string
+          format: date-time
+          nullable: true
+        position:
+          type: integer
+          description: Current position in active queue (1-based)
+        estimatedWaitTimeMinutes:
+          type: integer
+          description: Estimated wait time based on position and average service time
+
+    AdvanceQueueRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: [serve, no_show]
+        notes:
+          type: string
+          maxLength: 255
+
+    SkipCustomerRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 255
+        notes:
+          type: string
+          maxLength: 255
+
+    UpdateQueueStatusRequest:
+      type: object
+      required:
+        - queueOpen
+      properties:
+        queueOpen:
+          type: boolean
+        reason:
+          type: string
+          maxLength: 255
+
+    WhatsAppWebhookRequest:
+      type: object
+      properties:
+        object:
+          type: string
+        entry:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              changes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                    value:
+                      type: object
+                      properties:
+                        messaging_product:
+                          type: string
+                        metadata:
+                          type: object
+                          properties:
+                            display_phone_number:
+                              type: string
+                            phone_number_id:
+                              type: string
+                        contacts:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              profile:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                              wa_id:
+                                type: string
+                        messages:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              from:
+                                type: string
+                              id:
+                                type: string
+                              timestamp:
+                                type: string
+                              text:
+                                type: object
+                                properties:
+                                  body:
+                                    type: string
+                              type:
+                                type: string
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Business Management
+    description: Operations for managing businesses
+  - name: Queue Management
+    description: Operations for managing queues
+  - name: WhatsApp Integration
+    description: WhatsApp webhook handling
