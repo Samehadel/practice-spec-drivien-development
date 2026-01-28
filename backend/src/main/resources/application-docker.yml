@@ -1,0 +1,50 @@
+spring:
+  profiles:
+    active: dev
+  
+  # Database Configuration for Docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/whatsapp_queue
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # Redis Configuration for Docker
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: 
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  
+  # Logging for Docker
+  logging:
+    level:
+      com.example.whatsappqueue: INFO
+      org.springframework.web: WARN
+      org.springframework.security: WARN
+      org.springframework.data: WARN
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Server Configuration
+server:
+  port: 8080
+  address: 0.0.0.0
+
+# Management/Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

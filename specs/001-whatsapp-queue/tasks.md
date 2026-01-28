@@ -44,17 +44,17 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Setup PostgreSQL database with Liquibase in backend/src/main/resources/db/changelog/
-- [ ] T009 [P] Configure Redis connection and caching layer in backend/src/main/resources/application.yml
-- [ ] T010 [P] Setup Spring Security with JWT authentication framework in backend/src/main/java/com/example/whatsappqueue/infrastructure/security/
-- [ ] T011 [P] Setup API routing and controller structure in backend/src/main/java/com/example/whatsappqueue/api/
-- [ ] T012 Create base exception handling in backend/src/main/java/com/example/whatsappqueue/common/exception/
-- [ ] T013 Configure error handling and logging infrastructure in backend/src/main/resources/
-- [ ] T014 Setup environment configuration management in backend/src/main/resources/
-- [ ] T015 [P] Create MapStruct configuration in backend/src/main/java/com/example/whatsappqueue/infrastructure/mapper/
-- [ ] T016 Setup Angular Ngrx store structure in frontend/src/app/store/
-- [ ] T017 [P] Setup Angular Material UI components in frontend/src/app/
-- [ ] T018 Configure HTTP client services in frontend/src/app/services/api/
+- [x] T008 Setup PostgreSQL database with Liquibase in backend/src/main/resources/db/changelog/
+- [x] T009 [P] Configure Redis connection and caching layer in backend/src/main/resources/application.yml
+- [x] T010 [P] Setup Spring Security with JWT authentication framework in backend/src/main/java/com/example/whatsappqueue/infrastructure/security/
+- [x] T011 [P] Setup API routing and controller structure in backend/src/main/java/com/example/whatsappqueue/api/
+- [x] T012 Create base exception handling in backend/src/main/java/com/example/whatsappqueue/common/exception/
+- [x] T013 Configure error handling and logging infrastructure in backend/src/main/resources/
+- [x] T014 Setup environment configuration management in backend/src/main/resources/
+- [x] T015 [P] Create MapStruct configuration in backend/src/main/java/com/example/whatsappqueue/infrastructure/mapper/
+- [x] T016 Setup Angular Ngrx store structure in frontend/src/app/store/
+- [x] T017 [P] Setup Angular Material UI components in frontend/src/app/
+- [x] T018 Configure HTTP client services in frontend/src/app/services/api/
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

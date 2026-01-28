@@ -1,0 +1,42 @@
+spring:
+  profiles:
+    active: test
+  
+  # Database Configuration for Tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # JPA Configuration for Tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+  # Redis Configuration for Tests (embedded)
+  data:
+    redis:
+      host: localhost
+      port: 6370
+      database: 0
+      timeout: 1000ms
+  
+  # Liquibase Configuration for Tests
+  liquibase:
+    contexts: test
+  
+  # Cache Configuration for Tests
+  cache:
+    type: none
+  
+  # Logging for Tests
+  logging:
+    level:
+      com.example.whatsappqueue: DEBUG
+      org.springframework.web: DEBUG
+      org.springframework.security: DEBUG
+      org.springframework.data: DEBUG
+      liquibase: WARN
