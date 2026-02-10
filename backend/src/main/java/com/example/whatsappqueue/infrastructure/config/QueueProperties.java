@@ -9,7 +9,7 @@ public class QueueProperties {
 
     private Cache cache = new Cache();
     private Notification notification = new Notification();
-    private Eta eta = new Eta();
+    private Eta eta = new Eta(); // Estimated Time of Arrival
 
     public static class Cache {
         private int ttl = 3600; // 1 hour in seconds
