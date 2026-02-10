@@ -66,21 +66,12 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 
 **Independent Test**: Send join message to business WhatsApp number → receive confirmation with position and ETA within 10 seconds
 
-### Tests for User Story 1 ⚠️
-
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
-
-- [ ] T019 [P] [US1] Unit test for Business entity in backend/src/test/java/com/example/whatsappqueue/domain/BusinessTest.java
-- [ ] T020 [P] [US1] Unit test for QueueEntry entity in backend/src/test/java/com/example/whatsappqueue/domain/QueueEntryTest.java
-- [ ] T021 [P] [US1] Integration test for WhatsApp webhook in backend/src/test/java/com/example/whatsappqueue/api/WhatsAppWebhookControllerTest.java
-- [ ] T022 [P] [US1] Contract test for join queue endpoint in backend/src/test/java/com/example/whatsappqueue/api/QueueControllerTest.java
-
 ### Implementation for User Story 1
 
-- [ ] T023 [P] [US1] Create Business entity in backend/src/main/java/com/example/whatsappqueue/domain/Business.java
-- [ ] T024 [P] [US1] Create QueueEntry entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueEntry.java
-- [ ] T025 [P] [US1] Create Notification entity in backend/src/main/java/com/example/whatsappqueue/domain/Notification.java
-- [ ] T026 [P] [US1] Create QueueStateChange entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueStateChange.java
+- [x] T023 [P] [US1] Create Business entity in backend/src/main/java/com/example/whatsappqueue/domain/Business.java
+- [x] T024 [P] [US1] Create QueueEntry entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueEntry.java
+- [x] T025 [P] [US1] Create Notification entity in backend/src/main/java/com/example/whatsappqueue/domain/Notification.java
+- [x] T026 [P] [US1] Create QueueStateChange entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueStateChange.java
 - [ ] T027 [P] [US1] Create Business repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/BusinessRepository.java
 - [ ] T028 [P] [US1] Create QueueEntry repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/QueueEntryRepository.java
 - [ ] T029 [P] [US1] Create Notification repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/NotificationRepository.java
@@ -96,6 +87,13 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 - [ ] T039 [US1] Add validation and error handling for queue operations
 - [ ] T040 [US1] Add logging for user story 1 operations
 - [ ] T041 [US1] Configure Redis queue operations in backend/src/main/java/com/example/whatsappqueue/infrastructure/cache/
+
+### Tests for User Story 1 ⚠️
+
+- [ ] T019 [P] [US1] Unit test for Business entity in backend/src/test/java/com/example/whatsappqueue/domain/BusinessTest.java
+- [ ] T020 [P] [US1] Unit test for QueueEntry entity in backend/src/test/java/com/example/whatsappqueue/domain/QueueEntryTest.java
+- [ ] T021 [P] [US1] Integration test for WhatsApp webhook in backend/src/test/java/com/example/whatsappqueue/api/WhatsAppWebhookControllerTest.java
+- [ ] T022 [P] [US1] Contract test for join queue endpoint in backend/src/test/java/com/example/whatsappqueue/api/QueueControllerTest.java
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
