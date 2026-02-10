@@ -9,6 +9,7 @@ backend/.DS_Store
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/.angular/cache/
 frontend/.idea/
 frontend/*.iml
 frontend/.DS_Store
