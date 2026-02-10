@@ -1,5 +1,5 @@
 # Backend
-backend/logs/**
+backend/logs/
 backend/target/
 backend/.idea/
 backend/*.iml
@@ -38,6 +38,10 @@ build/
 .project
 .settings/
 bin/
+
+# Development tools
+.specify/
+.windsurf/
 
 # OS
 .DS_Store
