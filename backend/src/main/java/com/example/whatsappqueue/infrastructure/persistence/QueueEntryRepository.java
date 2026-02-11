@@ -19,7 +19,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param businessId the business ID to filter by
      * @return List of active queue entries ordered by join time
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
     List<QueueEntry> findActiveEntriesByBusinessId(@Param("businessId") Long businessId);
 
     /**
@@ -29,7 +29,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param whatsappIdentifier the WhatsApp identifier
      * @return Optional containing the queue entry if found
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
     Optional<QueueEntry> findActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") Long businessId,
                                                                          @Param("whatsappIdentifier") String whatsappIdentifier);
 
@@ -48,7 +48,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param status the status to filter by
      * @return List of queue entries with the specified status
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = :status ORDER BY qe.joinedAt ASC")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = :status ORDER BY qe.joinedAt ASC")
     List<QueueEntry> findByBusinessIdAndStatus(@Param("businessId") Long businessId,
                                                @Param("status") QueueEntry.Status status);
 
@@ -58,7 +58,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param businessId the business ID
      * @return number of active queue entries
      */
-    @Query("SELECT COUNT(qe) FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE'")
+    @Query("SELECT COUNT(qe) FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = 'ACTIVE'")
     long countActiveEntriesByBusinessId(@Param("businessId") Long businessId);
 
     /**
@@ -68,7 +68,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param joinedAfter the time threshold
      * @return List of queue entries that joined after the specified time
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.joinedAt > :joinedAfter ORDER BY qe.joinedAt ASC")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.joinedAt > :joinedAfter ORDER BY qe.joinedAt ASC")
     List<QueueEntry> findByBusinessIdAndJoinedAtAfter(@Param("businessId") Long businessId,
                                                       @Param("joinedAfter") LocalDateTime joinedAfter);
 
@@ -80,7 +80,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param servedTo the end of the time range
      * @return List of queue entries served within the time range
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'SERVED' AND qe.servedAt BETWEEN :servedFrom AND :servedTo ORDER BY qe.servedAt ASC")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = 'SERVED' AND qe.servedAt BETWEEN :servedFrom AND :servedTo ORDER BY qe.servedAt ASC")
     List<QueueEntry> findServedEntriesByBusinessIdAndTimeRange(@Param("businessId") Long businessId,
                                                               @Param("servedFrom") LocalDateTime servedFrom,
                                                               @Param("servedTo") LocalDateTime servedTo);
@@ -92,7 +92,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param whatsappIdentifier the WhatsApp identifier
      * @return true if an active entry exists, false otherwise
      */
-    @Query("SELECT CASE WHEN COUNT(qe) > 0 THEN true ELSE false END FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
+    @Query("SELECT CASE WHEN COUNT(qe) > 0 THEN true ELSE false END FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
     boolean existsActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") Long businessId,
                                                              @Param("whatsappIdentifier") String whatsappIdentifier);
 
@@ -102,6 +102,6 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      * @param businessId the business ID
      * @return Optional containing the next queue entry if found
      */
-    @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
+    @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
     Optional<QueueEntry> findNextCustomerForBusiness(@Param("businessId") Long businessId);
 }

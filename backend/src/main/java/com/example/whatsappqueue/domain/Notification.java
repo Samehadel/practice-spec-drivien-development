@@ -41,12 +41,6 @@ public class Notification {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "business_id", nullable = false)
-    private Long businessId;
-
-    @Column(name = "queue_entry_id")
-    private Long queueEntryId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)
     private MessageType messageType;
@@ -106,8 +100,8 @@ public class Notification {
     public String toString() {
         return "Notification{" +
                 "id=" + id +
-                ", businessId=" + businessId +
-                ", queueEntryId=" + queueEntryId +
+                ", business=" + business +
+                ", queueEntry=" + queueEntry +
                 ", messageType=" + messageType +
                 ", content='" + content + '\'' +
                 ", status=" + status +

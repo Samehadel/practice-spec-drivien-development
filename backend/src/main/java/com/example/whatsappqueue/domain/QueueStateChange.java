@@ -34,12 +34,6 @@ public class QueueStateChange {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "business_id", nullable = false)
-    private Long businessId;
-
-    @Column(name = "queue_entry_id")
-    private Long queueEntryId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "change_type", nullable = false)
     private ChangeType changeType;
@@ -92,8 +86,8 @@ public class QueueStateChange {
     public String toString() {
         return "QueueStateChange{" +
                 "id=" + id +
-                ", businessId=" + businessId +
-                ", queueEntryId=" + queueEntryId +
+                ", business=" + business +
+                ", queueEntry=" + queueEntry +
                 ", changeType=" + changeType +
                 ", reason='" + reason + '\'' +
                 ", createdAt=" + createdAt +

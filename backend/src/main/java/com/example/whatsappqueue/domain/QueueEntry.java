@@ -33,9 +33,6 @@ public class QueueEntry {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "business_id", nullable = false)
-    private Long businessId;
-
     @Column(name = "whatsapp_identifier", nullable = false)
     private String whatsappIdentifier;
 
@@ -99,7 +96,7 @@ public class QueueEntry {
     public String toString() {
         return "QueueEntry{" +
                 "id=" + id +
-                ", businessId=" + businessId +
+                ", business=" + business +
                 ", whatsappIdentifier='" + whatsappIdentifier + '\'' +
                 ", customerName='" + customerName + '\'' +
                 ", status=" + status +
