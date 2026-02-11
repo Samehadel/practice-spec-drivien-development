@@ -72,9 +72,9 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 - [x] T024 [P] [US1] Create QueueEntry entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueEntry.java
 - [x] T025 [P] [US1] Create Notification entity in backend/src/main/java/com/example/whatsappqueue/domain/Notification.java
 - [x] T026 [P] [US1] Create QueueStateChange entity in backend/src/main/java/com/example/whatsappqueue/domain/QueueStateChange.java
-- [ ] T027 [P] [US1] Create Business repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/BusinessRepository.java
-- [ ] T028 [P] [US1] Create QueueEntry repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/QueueEntryRepository.java
-- [ ] T029 [P] [US1] Create Notification repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/NotificationRepository.java
+- [x] T027 [P] [US1] Create Business repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/BusinessRepository.java
+- [x] T028 [P] [US1] Create QueueEntry repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/QueueEntryRepository.java
+- [x] T029 [P] [US1] Create Notification repository in backend/src/main/java/com/example/whatsappqueue/infrastructure/persistence/NotificationRepository.java
 - [ ] T030 [P] [US1] Create MapStruct mappers in backend/src/main/java/com/example/whatsappqueue/infrastructure/mapper/
 - [ ] T031 [US1] Implement QueueService in backend/src/main/java/com/example/whatsappqueue/application/QueueService.java (depends on T023-T030)
 - [ ] T032 [US1] Implement WhatsAppService in backend/src/main/java/com/example/whatsappqueue/application/WhatsAppService.java
