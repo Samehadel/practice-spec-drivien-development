@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -52,6 +53,20 @@ public class QueueStateChange {
 
     @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
+
+    /*
+     * We may not need bi-directional relationship, let' keep an eye on it
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_id", nullable = false)
+    private Business business;
+
+    /*
+     * We may not need bi-directional relationship, let' keep an eye on it
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "queue_entry_id")
+    private QueueEntry queueEntry;
 
     @PrePersist
     protected void onCreate() {

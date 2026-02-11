@@ -9,8 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "businesses")
@@ -42,6 +42,9 @@ public class Business {
 
     @Column(name = "notification_threshold", nullable = false)
     private Integer notificationThreshold = 3;
+
+    @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<QueueEntry> queueEntries;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

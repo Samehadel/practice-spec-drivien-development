@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -57,6 +58,13 @@ public class QueueEntry {
 
     @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
+
+    /*
+     * We may not need bi-directional relationship, let' keep an eye on it
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_id", nullable = false)
+    private Business business;
 
     @PrePersist
     protected void onCreate() {
