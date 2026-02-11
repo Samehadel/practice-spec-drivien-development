@@ -2,9 +2,9 @@
 -- changeset Sameh.Adel:003-create-notifications-table
 
 CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    business_id UUID NOT NULL,
-    queue_entry_id UUID NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    business_id BIGINT NOT NULL,
+    queue_entry_id BIGINT,
     message_type VARCHAR(50) NOT NULL,
     content TEXT NOT NULL,
     status VARCHAR(20) NOT NULL,

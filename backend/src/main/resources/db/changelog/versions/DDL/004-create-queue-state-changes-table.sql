@@ -2,9 +2,9 @@
 -- changeset Sameh.Adel:004-create-queue-state-changes-table
 
 CREATE TABLE queue_state_changes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    business_id UUID NOT NULL,
-    queue_entry_id UUID,
+    id BIGSERIAL PRIMARY KEY,
+    business_id BIGINT NOT NULL,
+    queue_entry_id BIGINT,
     change_type VARCHAR(50) NOT NULL,
     reason VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

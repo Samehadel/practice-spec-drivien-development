@@ -2,13 +2,14 @@
 -- changeset Sameh.Adel:002-create-queue-entries-table
 
 CREATE TABLE queue_entries (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    business_id UUID NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    business_id BIGINT NOT NULL,
     whatsapp_identifier VARCHAR(255) NOT NULL,
     customer_name VARCHAR(255),
     status VARCHAR(20) NOT NULL,
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     served_at TIMESTAMP,
+    position INTEGER,
     metadata JSONB
 );
 

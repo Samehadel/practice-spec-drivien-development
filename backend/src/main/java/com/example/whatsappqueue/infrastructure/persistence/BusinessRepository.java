@@ -7,10 +7,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface BusinessRepository extends JpaRepository<Business, UUID> {
+public interface BusinessRepository extends JpaRepository<Business, Long> {
 
     /**
      * Find a business by its WhatsApp phone number.

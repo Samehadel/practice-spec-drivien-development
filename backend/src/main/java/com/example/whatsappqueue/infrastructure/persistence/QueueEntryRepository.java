@@ -9,10 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
+public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
 
     /**
      * Find active queue entries for a specific business.
@@ -21,7 +20,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return List of active queue entries ordered by join time
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
-    List<QueueEntry> findActiveEntriesByBusinessId(@Param("businessId") UUID businessId);
+    List<QueueEntry> findActiveEntriesByBusinessId(@Param("businessId") Long businessId);
 
     /**
      * Find a queue entry by business ID and WhatsApp identifier for active entries only.
@@ -31,7 +30,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return Optional containing the queue entry if found
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
-    Optional<QueueEntry> findActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") UUID businessId,
+    Optional<QueueEntry> findActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") Long businessId,
                                                                          @Param("whatsappIdentifier") String whatsappIdentifier);
 
     /**
@@ -40,7 +39,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @param businessId the business ID to filter by
      * @return List of all queue entries for the business
      */
-    List<QueueEntry> findByBusinessId(UUID businessId);
+    List<QueueEntry> findByBusinessId(Long businessId);
 
     /**
      * Find queue entries by status for a specific business.
@@ -50,7 +49,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return List of queue entries with the specified status
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = :status ORDER BY qe.joinedAt ASC")
-    List<QueueEntry> findByBusinessIdAndStatus(@Param("businessId") UUID businessId,
+    List<QueueEntry> findByBusinessIdAndStatus(@Param("businessId") Long businessId,
                                                @Param("status") QueueEntry.Status status);
 
     /**
@@ -60,7 +59,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return number of active queue entries
      */
     @Query("SELECT COUNT(qe) FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE'")
-    long countActiveEntriesByBusinessId(@Param("businessId") UUID businessId);
+    long countActiveEntriesByBusinessId(@Param("businessId") Long businessId);
 
     /**
      * Find queue entries that joined after a specific time for a business.
@@ -70,7 +69,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return List of queue entries that joined after the specified time
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.joinedAt > :joinedAfter ORDER BY qe.joinedAt ASC")
-    List<QueueEntry> findByBusinessIdAndJoinedAtAfter(@Param("businessId") UUID businessId,
+    List<QueueEntry> findByBusinessIdAndJoinedAtAfter(@Param("businessId") Long businessId,
                                                       @Param("joinedAfter") LocalDateTime joinedAfter);
 
     /**
@@ -82,7 +81,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return List of queue entries served within the time range
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'SERVED' AND qe.servedAt BETWEEN :servedFrom AND :servedTo ORDER BY qe.servedAt ASC")
-    List<QueueEntry> findServedEntriesByBusinessIdAndTimeRange(@Param("businessId") UUID businessId,
+    List<QueueEntry> findServedEntriesByBusinessIdAndTimeRange(@Param("businessId") Long businessId,
                                                               @Param("servedFrom") LocalDateTime servedFrom,
                                                               @Param("servedTo") LocalDateTime servedTo);
 
@@ -94,7 +93,7 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return true if an active entry exists, false otherwise
      */
     @Query("SELECT CASE WHEN COUNT(qe) > 0 THEN true ELSE false END FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.whatsappIdentifier = :whatsappIdentifier AND qe.status = 'ACTIVE'")
-    boolean existsActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") UUID businessId,
+    boolean existsActiveEntryByBusinessIdAndWhatsappIdentifier(@Param("businessId") Long businessId,
                                                              @Param("whatsappIdentifier") String whatsappIdentifier);
 
     /**
@@ -104,5 +103,5 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, UUID> {
      * @return Optional containing the next queue entry if found
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.businessId = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
-    Optional<QueueEntry> findNextCustomerForBusiness(@Param("businessId") UUID businessId);
+    Optional<QueueEntry> findNextCustomerForBusiness(@Param("businessId") Long businessId);
 }

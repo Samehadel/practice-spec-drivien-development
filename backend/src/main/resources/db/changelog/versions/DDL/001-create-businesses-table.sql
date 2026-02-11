@@ -2,7 +2,7 @@
 -- changeset Sameh.Adel:001-create-businesses-table
 
 CREATE TABLE businesses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     service_type VARCHAR(100) NOT NULL,
     whatsapp_phone_number VARCHAR(20) NOT NULL UNIQUE,

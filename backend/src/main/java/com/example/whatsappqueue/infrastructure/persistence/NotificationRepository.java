@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, UUID> {
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     /**
      * Find notifications by business ID.
@@ -19,7 +18,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @param businessId the business ID to filter by
      * @return List of notifications for the business ordered by sent time
      */
-    List<Notification> findByBusinessIdOrderBySentAtDesc(UUID businessId);
+    List<Notification> findByBusinessIdOrderBySentAtDesc(Long businessId);
 
     /**
      * Find notifications by queue entry ID.
@@ -27,7 +26,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @param queueEntryId the queue entry ID to filter by
      * @return List of notifications for the queue entry ordered by sent time
      */
-    List<Notification> findByQueueEntryIdOrderBySentAtDesc(UUID queueEntryId);
+    List<Notification> findByQueueEntryIdOrderBySentAtDesc(Long queueEntryId);
 
     /**
      * Find notifications by business ID and message type.
@@ -37,7 +36,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return List of notifications matching the criteria
      */
     @Query("SELECT n FROM Notification n WHERE n.businessId = :businessId AND n.messageType = :messageType ORDER BY n.sentAt DESC")
-    List<Notification> findByBusinessIdAndMessageType(@Param("businessId") UUID businessId,
+    List<Notification> findByBusinessIdAndMessageType(@Param("businessId") Long businessId,
                                                         @Param("messageType") Notification.MessageType messageType);
 
     /**
@@ -56,7 +55,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return List of notifications matching the criteria
      */
     @Query("SELECT n FROM Notification n WHERE n.businessId = :businessId AND n.status = :status ORDER BY n.sentAt ASC")
-    List<Notification> findByBusinessIdAndStatus(@Param("businessId") UUID businessId,
+    List<Notification> findByBusinessIdAndStatus(@Param("businessId") Long businessId,
                                                   @Param("status") Notification.Status status);
 
     /**
@@ -66,7 +65,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return List of pending notifications ordered by sent time
      */
     @Query("SELECT n FROM Notification n WHERE n.businessId = :businessId AND n.status = 'PENDING' ORDER BY n.sentAt ASC")
-    List<Notification> findPendingNotificationsByBusinessId(@Param("businessId") UUID businessId);
+    List<Notification> findPendingNotificationsByBusinessId(@Param("businessId") Long businessId);
 
     /**
      * Find failed notifications for a business.
@@ -75,7 +74,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return List of failed notifications ordered by sent time
      */
     @Query("SELECT n FROM Notification n WHERE n.businessId = :businessId AND n.status = 'FAILED' ORDER BY n.sentAt DESC")
-    List<Notification> findFailedNotificationsByBusinessId(@Param("businessId") UUID businessId);
+    List<Notification> findFailedNotificationsByBusinessId(@Param("businessId") Long businessId);
 
     /**
      * Find notifications sent within a time range for a business.
@@ -86,7 +85,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return List of notifications sent within the time range
      */
     @Query("SELECT n FROM Notification n WHERE n.businessId = :businessId AND n.sentAt BETWEEN :sentFrom AND :sentTo ORDER BY n.sentAt DESC")
-    List<Notification> findByBusinessIdAndSentAtBetween(@Param("businessId") UUID businessId,
+    List<Notification> findByBusinessIdAndSentAtBetween(@Param("businessId") Long businessId,
                                                         @Param("sentFrom") LocalDateTime sentFrom,
                                                         @Param("sentTo") LocalDateTime sentTo);
 
@@ -98,7 +97,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return number of notifications with the specified status
      */
     @Query("SELECT COUNT(n) FROM Notification n WHERE n.businessId = :businessId AND n.status = :status")
-    long countByBusinessIdAndStatus(@Param("businessId") UUID businessId,
+    long countByBusinessIdAndStatus(@Param("businessId") Long businessId,
                                    @Param("status") Notification.Status status);
 
     /**
@@ -109,7 +108,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return number of notifications of the specified type
      */
     @Query("SELECT COUNT(n) FROM Notification n WHERE n.businessId = :businessId AND n.messageType = :messageType")
-    long countByBusinessIdAndMessageType(@Param("businessId") UUID businessId,
+    long countByBusinessIdAndMessageType(@Param("businessId") Long businessId,
                                         @Param("messageType") Notification.MessageType messageType);
 
     /**
@@ -119,7 +118,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
      * @return Optional containing the most recent notification if found
      */
     @Query("SELECT n FROM Notification n WHERE n.queueEntryId = :queueEntryId ORDER BY n.sentAt DESC")
-    List<Notification> findMostRecentNotificationForQueueEntry(@Param("queueEntryId") UUID queueEntryId);
+    List<Notification> findMostRecentNotificationForQueueEntry(@Param("queueEntryId") Long queueEntryId);
 
     /**
      * Find notifications that need to be retried (failed notifications sent recently).

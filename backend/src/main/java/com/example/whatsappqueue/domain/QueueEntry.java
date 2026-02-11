@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "queue_entries")
@@ -29,11 +28,12 @@ public class QueueEntry {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private Long id;
 
     @Column(name = "business_id", nullable = false)
-    private UUID businessId;
+    private Long businessId;
 
     @Column(name = "whatsapp_identifier", nullable = false)
     private String whatsappIdentifier;
@@ -60,9 +60,6 @@ public class QueueEntry {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID();
-        }
         if (joinedAt == null) {
             joinedAt = LocalDateTime.now();
         }
@@ -82,12 +79,12 @@ public class QueueEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         QueueEntry that = (QueueEntry) o;
-        return Objects.equals(id, that.id);
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getClass().hashCode();
     }
 
     @Override
