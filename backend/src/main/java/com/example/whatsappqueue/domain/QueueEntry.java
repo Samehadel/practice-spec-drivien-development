@@ -1,17 +1,23 @@
 package com.example.whatsappqueue.domain;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "queue_entries")
@@ -19,7 +25,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueueEntry {
+@EqualsAndHashCode(callSuper = true)
+public class QueueEntry extends BaseEntity {
 
     public enum Status {
         ACTIVE,
@@ -27,11 +34,6 @@ public class QueueEntry {
         NO_SHOW,
         LEFT
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, nullable = false)
-    private Long id;
 
     @Column(name = "whatsapp_identifier", nullable = false)
     private String whatsappIdentifier;
@@ -63,14 +65,7 @@ public class QueueEntry {
     @JoinColumn(name = "business_id", nullable = false)
     private Business business;
 
-    @PrePersist
-    protected void onCreate() {
-        if (joinedAt == null) {
-            joinedAt = LocalDateTime.now();
-        }
-    }
-
-    public long calculateWaitTime() {
+    public long waitTime() {
         if (servedAt != null && joinedAt != null) {
             return ChronoUnit.MINUTES.between(joinedAt, servedAt);
         } else if (joinedAt != null) {
@@ -80,22 +75,9 @@ public class QueueEntry {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QueueEntry that = (QueueEntry) o;
-        return id != null && Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
     public String toString() {
         return "QueueEntry{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", business=" + business +
                 ", whatsappIdentifier='" + whatsappIdentifier + '\'' +
                 ", customerName='" + customerName + '\'' +

@@ -1,12 +1,14 @@
 package com.example.whatsappqueue.infrastructure.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import com.example.whatsappqueue.domain.BaseEntity;
+import com.example.whatsappqueue.application.dto.BaseDto;
 
-@Mapper(
-    componentModel = "spring",
-    unmappedTargetPolicy = ReportingPolicy.ERROR
-)
-public interface BaseMapper {
-    // Base mapper interface with common configuration
+import java.util.List;
+
+interface BaseMapper<E extends BaseEntity, D extends BaseDto> {
+    
+    D toDto(E entity);
+    E toEntity(D dto);
+    List<D> toDtoList(List<E> entities);
+    List<E> toEntityList(List<D> dtos);
 }

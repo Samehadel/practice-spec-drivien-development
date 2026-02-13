@@ -5,11 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -18,7 +16,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+@EqualsAndHashCode(callSuper = true)
+public class Notification extends BaseEntity {
 
     public enum MessageType {
         JOIN_CONFIRMATION,
@@ -35,11 +34,6 @@ public class Notification {
         DELIVERED,
         FAILED
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, nullable = false)
-    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)
@@ -76,30 +70,10 @@ public class Notification {
     @JoinColumn(name = "queue_entry_id")
     private QueueEntry queueEntry;
 
-    @PrePersist
-    protected void onCreate() {
-        if (sentAt == null) {
-            sentAt = LocalDateTime.now();
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Notification that = (Notification) o;
-        return id != null && Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     public String toString() {
         return "Notification{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", business=" + business +
                 ", queueEntry=" + queueEntry +
                 ", messageType=" + messageType +

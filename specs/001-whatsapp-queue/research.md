@@ -64,7 +64,7 @@
 ## Technology Stack Summary
 
 ### Backend
-- **Java 17** with Spring Boot 3.x
+- **Java 21** with Spring Boot 3.x
 - **Spring Data JPA** with PostgreSQL for persistence
 - **Redis** for real-time queue state and caching
 - **MapStruct** for object mapping

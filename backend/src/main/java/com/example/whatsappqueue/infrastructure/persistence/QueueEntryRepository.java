@@ -104,4 +104,34 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
      */
     @Query("SELECT qe FROM QueueEntry qe WHERE qe.business.id = :businessId AND qe.status = 'ACTIVE' ORDER BY qe.joinedAt ASC")
     Optional<QueueEntry> findNextCustomerForBusiness(@Param("businessId") Long businessId);
+
+    /**
+     * Find queue entries by business ID, WhatsApp identifier, and status.
+     * 
+     * @param businessId the business ID
+     * @param whatsappIdentifier the WhatsApp identifier
+     * @param status the status to filter by
+     * @return Optional containing the queue entry if found
+     */
+    Optional<QueueEntry> findByBusinessIdAndWhatsappIdentifierAndStatus(Long businessId, 
+                                                                       String whatsappIdentifier, 
+                                                                       QueueEntry.Status status);
+
+    /**
+     * Count queue entries by business ID and status.
+     * 
+     * @param businessId the business ID
+     * @param status the status to filter by
+     * @return number of queue entries with the specified status
+     */
+    Integer countByBusinessIdAndStatus(Long businessId, QueueEntry.Status status);
+
+    /**
+     * Find queue entries by business ID and status, ordered by position ascending.
+     * 
+     * @param businessId the business ID
+     * @param status the status to filter by
+     * @return List of queue entries with the specified status ordered by position
+     */
+    List<QueueEntry> findByBusinessIdAndStatusOrderByPositionAsc(Long businessId, QueueEntry.Status status);
 }
