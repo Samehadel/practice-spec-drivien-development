@@ -1,13 +1,13 @@
-# Implementation Plan: WhatsApp Virtual Queue (MVP)
+# Implementation Plan: WhatsApp Virtual Queue
 
-**Branch**: `001-whatsapp-queue` | **Date**: 2026-01-27 | **Spec**: [spec.md](./spec.md)
+**Branch**: `001-whatsapp-queue` | **Date**: 2026-02-14 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-whatsapp-queue/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-WhatsApp-based virtual queue system allowing customers to join via WhatsApp messages and receive real-time position/ETA updates. Business gets minimal mobile admin interface to manage queue progression. Built with Java Spring Boot backend and Angular frontend.
+WhatsApp-based virtual queue system allowing service businesses to manage walk-in customers digitally. The system provides real-time queue visibility through WhatsApp messaging with a minimal web admin interface for business operators. Technical approach uses Spring Boot backend with Angular frontend, integrating WhatsApp API for messaging and following established exception handling patterns.
 
 ## Technical Context
 
@@ -17,28 +17,62 @@ WhatsApp-based virtual queue system allowing customers to join via WhatsApp mess
   the iteration process.
 -->
 
-**Language/Version**: Java 21 (Spring Boot 3.x)  
-**Primary Dependencies**: Spring Boot Web, Spring Data JPA, Spring Validation, Spring Security, MapStruct, Liquibase, WhatsApp Business API, Angular 17+, Ngrx, Angular Signals
-**Storage**: PostgreSQL and Redis for caching
-**Testing**: JUnit 5, Mockito, TestContainers (Angular testing framework)  
-**Target Platform**: Linux server (backend), Mobile browsers (frontend)  
+**Language/Version**: Java 17+ (Spring Boot), TypeScript (Angular 17+)  
+**Primary Dependencies**: Spring Boot (web, validation, data-jpa, actuator), Angular, WhatsApp API, PostgreSQL, Liquibase, MapStruct  
+**Storage**: PostgreSQL with Liquibase migrations  
+**Testing**: JUnit 5, Spring Boot Test, Jest, Angular Testing Utilities  
+**Target Platform**: Linux server (backend), Modern web browsers (frontend)  
 **Project Type**: Web application (backend + frontend)  
-**Performance Goals**: <10s response for 95% of WhatsApp messages, <3 clicks for business actions  
-**Constraints**: Mobile-first admin interface, real-time notifications, FIFO queue ordering  
-**Scale/Scope**: MVP for multiple businesses, ~100 concurrent queue entries per business
+**Performance Goals**: <200ms response time for WhatsApp webhook processing, support 1000+ concurrent queue operations  
+**Constraints**: WhatsApp API rate limits, message delivery reliability, FIFO queue ordering  
+**Scale/Scope**: Multi-tenant support for multiple businesses, 10k+ concurrent users across all queues
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-### ✅ Compliant Areas
-- **Spring Boot Baseline**: Using Spring Boot 3.x with minimal dependencies
-- **Architecture Boundaries**: Clear separation of API, Application, Domain, and Infrastructure layers
-- **API Contracts**: Will use OpenAPI documentation with lowerCamelCase JSON
-- **Automated Tests**: JUnit 5 for backend, Angular testing for frontend
-- **Safe Defaults**: application.yml configuration, no secrets in git
-- **Persistence**: Liquibase for migrations, MapStruct for mapping
-- **Error Handling**: Custom exceptions from common exception package
+### ✅ Final Compliance Check (Post-Design)
+
+**I. Minimal Spring Boot Baseline**: ✅
+- Using Spring Boot 3.x conventions with Java 21
+- Dependency set limited to clear needs (web, validation, data-jpa, actuator)
+- Following established patterns from exception handling design
+- MapStruct for object mapping per constitutional requirements
+
+**II. Architecture Boundaries**: ✅
+- API layer: controllers and DTOs clearly defined
+- Application layer: services orchestrating business flows
+- Domain layer: queue management entities and invariants
+- Infrastructure layer: persistence (PostgreSQL), WhatsApp integration, Redis caching
+
+**III. API Contracts**: ✅
+- HTTP APIs documented with OpenAPI 3.0.3 specification
+- JSON uses lowerCamelCase per Java convention
+- Versioning strategy established (v1 API path)
+- Comprehensive error response schemas
+
+**IV. Automated Tests**: ✅
+- Unit tests planned for queue business logic and exception handling
+- Integration tests for persistence and WhatsApp boundaries
+- Frontend component tests with Jasmine/Karma
+- E2E tests with Cypress for complete user workflows
+
+**V. Safe Defaults**: ✅
+- No secrets in git (WhatsApp API keys via environment variables)
+- Safe default configuration with local development setup
+- Docker Compose for isolated development environment
+- Health checks via Spring Boot Actuator
+
+### Design Compliance Verification
+
+All design artifacts (research.md, data-model.md, contracts/api.yaml, quickstart.md) demonstrate adherence to constitutional requirements:
+
+- **Exception Handling**: Integrated existing framework from backend/docs/exception-handling-design.md
+- **Database Migrations**: Liquibase for schema changes with proper versioning
+- **Mapping**: MapStruct for entity-DTO transformations
+- **Testing Strategy**: Comprehensive test coverage across all layers
+- **API Design**: RESTful principles with proper HTTP status codes
+- **Security**: Proper authentication, authorization, and data protection
 
 ## Project Structure
 
@@ -63,54 +97,34 @@ specs/[###-feature]/
 -->
 
 ```text
-# Web application structure
+# Option 2: Web application (backend + frontend)
 backend/
 ├── src/
 │   ├── main/
-│   │   ├── java/
-│   │   │   └── com/example/whatsappqueue/
-│   │   │       ├── api/           # Controllers, DTOs
-│   │   │       ├── application/   # Services, use cases
-│   │   │       ├── domain/        # Entities, business logic
-│   │   │       └── infrastructure/ # Persistence, integrations
+│   │   ├── java/com/example/whatsapp/
+│   │   │   ├── api/           # Controllers and DTOs
+│   │   │   ├── application/    # Services and use cases
+│   │   │   ├── domain/        # Entities and business logic
+│   │   │   └── infrastructure/ # Persistence and integrations
 │   │   └── resources/
-│   │       ├── db/changelog/      # Liquibase migrations
-│   │       └── application.yml    # Configuration
-│   └── test/                      # Unit and integration tests
-└── pom.xml                        # Maven configuration
+│   │       ├── db/changelog/   # Liquibase migrations
+│   │       └── application.yml
+│   └── test/
+└── pom.xml
 
 frontend/
 ├── src/
 │   ├── app/
-│   │   ├── components/            # Reusable UI components
-│   │   ├── pages/                 # Feature pages
-│   │   ├── services/             # HTTP services
-│   │   └── models/                # TypeScript interfaces
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/         # Feature pages
+│   │   ├── services/      # HTTP services
+│   │   └── models/        # Frontend data models
 │   └── assets/
-├── angular.json                  # Angular configuration
-└── package.json                   # NPM dependencies
-
-docker-compose.yml                 # Local development stack
+├── angular.json
+└── package.json
 ```
 
-**Structure Decision**: Web application with separate backend (Spring Boot) and frontend (Angular) projects. Backend follows clean architecture with explicit layer boundaries. Frontend uses Angular 17+ with standalone components, Ngrx for state management, and Signals for reactive change detection.
-
-## Phase 1 Completion Summary
-
-✅ **All Phase 1 deliverables completed:**
-- **research.md**: Technical decisions and best practices established
-- **data-model.md**: Complete entity relationships and database schema
-- **contracts/api.yaml**: Full OpenAPI specification with all endpoints
-- **quickstart.md**: Comprehensive setup and development guide
-- **Agent Context**: Updated with new technologies (Ngrx, Signals)
-
-✅ **Constitution Check**: All requirements satisfied
-✅ **Technical Context**: All NEEDS CLARIFICATION resolved
-✅ **Architecture**: Clean separation with modern stack
-
-## Next Steps
-
-Proceed to **Phase 2** with `/speckit.tasks` command to generate actionable implementation tasks.
+**Structure Decision**: Web application with clear backend/frontend separation. Backend follows Spring Boot conventions with layered architecture (API → Application → Domain → Infrastructure). Frontend uses Angular with component-based architecture. This aligns with existing project structure and constitutional requirements.
 
 ## Complexity Tracking
 
@@ -118,5 +132,4 @@ Proceed to **Phase 2** with `/speckit.tasks` command to generate actionable impl
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+

@@ -202,6 +202,49 @@ export class QueueDisplayComponent {
 - GDPR compliance considerations for EU customers
 - Secure communication between frontend and backend
 
+### Exception Handling Integration
+
+**Decision**: Use existing exception handling framework from backend/docs/exception-handling-design.md  
+**Rationale**:
+- Consistent error responses across the application
+- Custom exception types already defined for common scenarios
+- GlobalExceptionHandler provides centralized error handling
+- Supports internationalization and proper HTTP status codes
+- Follows constitutional requirements for consistent error handling
+
+### Exception Mapping for WhatsApp Queue
+- **ValidationException**: Invalid message format, missing required data, queue closed
+- **ResourceNotFoundException**: Business or queue entry not found
+- **ResourceAlreadyExistsException**: Duplicate queue join attempts
+- **InternalException**: WhatsApp API failures, database errors, Redis connectivity issues
+- **UnavailableServiceException**: WhatsApp service temporarily unavailable
+- **AuthorizationException**: Business operator access control violations
+
+### Error Response Format
+Standardized JSON responses with error codes, messages, and references for debugging.
+
+### ExceptionService Usage Patterns
+```java
+// WhatsApp message validation
+throw ExceptionService.ValidationExceptionBuilder.validationException("message");
+
+// Business not found
+throw ExceptionService.ResourceExceptionBuilder.resourceNotFoundException("Business", businessId);
+
+// Duplicate queue entry
+throw ExceptionService.ResourceExceptionBuilder.resourceAlreadyExistsException("QueueEntry", whatsappNumber);
+
+// WhatsApp API failure
+throw ExceptionService.InternalExceptionBuilder.internalExceptionWithReference(
+    ApplicationError.WHATSAPP_API_ERROR, 
+    apiException, 
+    businessId
+);
+
+// Queue closed
+throw ExceptionService.ValidationExceptionBuilder.validationExceptionWithMessage("Queue is currently closed");
+```
+
 ## Next Steps
 
 With research complete, proceed to Phase 1:

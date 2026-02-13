@@ -80,10 +80,10 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 - [x] T032 [US1] Implement WhatsAppService in backend/src/main/java/com/example/whatsappqueue/application/WhatsAppService.java
 - [x] T033 [US1] Implement WhatsApp webhook controller in backend/src/main/java/com/example/whatsappqueue/api/WhatsAppWebhookController.java
 - [x] T034 [US1] Implement Queue controller in backend/src/main/java/com/example/whatsappqueue/api/QueueController.java
-- [ ] T035 [US1] Create Liquibase migration for Business table in backend/src/main/resources/db/changelog/versions/DDL/001-create-businesses-table.sql
-- [ ] T036 [US1] Create Liquibase migration for QueueEntry table in backend/src/main/resources/db/changelog/versions/DDL/002-create-queue-entries-table.sql
-- [ ] T037 [US1] Create Liquibase migration for Notification table in backend/src/main/resources/db/changelog/versions/DDL/003-create-notifications-table.sql
-- [ ] T038 [US1] Create Liquibase migration for QueueStateChange table in backend/src/main/resources/db/changelog/versions/DDL/004-create-queue-state-changes-table.sql
+- [x] T035 [US1] Create Liquibase migration for Business table in backend/src/main/resources/db/changelog/versions/DDL/001-create-businesses-table.sql
+- [x] T036 [US1] Create Liquibase migration for QueueEntry table in backend/src/main/resources/db/changelog/versions/DDL/002-create-queue-entries-table.sql
+- [x] T037 [US1] Create Liquibase migration for Notification table in backend/src/main/resources/db/changelog/versions/DDL/003-create-notifications-table.sql
+- [x] T038 [US1] Create Liquibase migration for QueueStateChange table in backend/src/main/resources/db/changelog/versions/DDL/004-create-queue-state-changes-table.sql
 - [ ] T039 [US1] Add validation and error handling for queue operations
 - [ ] T040 [US1] Add logging for user story 1 operations
 - [ ] T041 [US1] Configure Redis queue operations in backend/src/main/java/com/example/whatsappqueue/infrastructure/cache/
