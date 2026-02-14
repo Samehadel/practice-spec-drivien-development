@@ -2,9 +2,12 @@ package com.example.whatsappqueue.application;
 
 import com.example.whatsappqueue.application.dto.NotificationDto;
 import com.example.whatsappqueue.application.dto.QueueEntryDto;
-import com.example.whatsappqueue.common.exception.WhatsappApiException;
+import com.example.whatsappqueue.common.exception.ExceptionService;
+import com.example.whatsappqueue.domain.ApplicationError;
 import com.example.whatsappqueue.domain.Notification;
+import com.example.whatsappqueue.infrastructure.mapper.BusinessMapper;
 import com.example.whatsappqueue.infrastructure.mapper.NotificationMapper;
+import com.example.whatsappqueue.infrastructure.mapper.QueueEntryMapper;
 import com.example.whatsappqueue.infrastructure.persistence.NotificationRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +30,8 @@ public class WhatsAppService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final BusinessMapper businessMapper;
+    private final QueueEntryMapper queueEntryMapper;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -36,7 +41,7 @@ public class WhatsAppService {
     @Value("${whatsapp.api.token}")
     private String whatsappApiToken;
 
-    @Value("${whatsapp.phone-number-id}")
+    @Value("${whatsapp.api.phone-number-id}")
     private String phoneNumberId;
 
     @Transactional
@@ -123,7 +128,7 @@ public class WhatsAppService {
         return sendMessage(whatsappIdentifier, message, Notification.MessageType.QUEUE_CLOSED, null);
     }
 
-    private NotificationDto sendMessage(String whatsappIdentifier, String content, Notification.MessageType messageType, QueueEntryDto queueEntryDto) {
+    public NotificationDto sendMessage(String whatsappIdentifier, String content, Notification.MessageType messageType, QueueEntryDto queueEntryDto) {
         try {
             log.info("Sending WhatsApp message to {}: {}", whatsappIdentifier, messageType);
 
@@ -134,9 +139,9 @@ public class WhatsAppService {
                     .status(Notification.Status.PENDING)
                     .sentAt(LocalDateTime.now())
                     .business(queueEntryDto != null ? 
-                            notificationMapper.toEntity(queueEntryDto.getBusiness()) : null)
+                            businessMapper.toEntity(queueEntryDto.getBusiness()) : null)
                     .queueEntry(queueEntryDto != null ? 
-                            notificationMapper.toEntity(queueEntryDto) : null)
+                            queueEntryMapper.toEntity(queueEntryDto) : null)
                     .metadata(Map.of("messageId", UUID.randomUUID().toString()).toString())
                     .build();
 
@@ -157,7 +162,7 @@ public class WhatsAppService {
 
         } catch (Exception e) {
             log.error("Error sending WhatsApp message to {}: {}", whatsappIdentifier, e.getMessage(), e);
-            throw new WhatsappApiException("Failed to send WhatsApp message: " + e.getMessage());
+            throw ExceptionService.InternalExceptionBuilder.internalException(ApplicationError.INTERNAL_ERROR, e);
         }
     }
 

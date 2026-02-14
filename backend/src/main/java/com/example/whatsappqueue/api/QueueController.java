@@ -2,7 +2,6 @@ package com.example.whatsappqueue.api;
 
 import com.example.whatsappqueue.application.QueueService;
 import com.example.whatsappqueue.application.dto.QueueEntryDto;
-import com.example.whatsappqueue.common.exception.QueueEntryNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -73,10 +72,6 @@ public class QueueController {
             
             return ResponseEntity.ok(queueEntry);
             
-        } catch (QueueEntryNotFoundException e) {
-            log.warn("Queue entry not found: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
-            
         } catch (Exception e) {
             log.error("Error getting queue entry {}: {}", queueEntryId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -146,10 +141,6 @@ public class QueueController {
             
             return ResponseEntity.ok(queueEntry);
             
-        } catch (QueueEntryNotFoundException e) {
-            log.warn("Customer {} not found in queue: {}", request.getWhatsappIdentifier(), e.getMessage());
-            return ResponseEntity.notFound().build();
-            
         } catch (Exception e) {
             log.error("Error leaving queue for customer {} in business {}: {}", 
                     request.getWhatsappIdentifier(), request.getBusinessId(), e.getMessage(), e);
@@ -169,10 +160,6 @@ public class QueueController {
             log.info("Updated queue entry {} position successfully", queueEntryId);
             
             return ResponseEntity.ok(queueEntry);
-            
-        } catch (QueueEntryNotFoundException e) {
-            log.warn("Queue entry not found: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
             
         } catch (Exception e) {
             log.error("Error updating queue entry {} position: {}", queueEntryId, e.getMessage(), e);

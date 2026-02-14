@@ -2,9 +2,9 @@ package com.example.whatsappqueue.api;
 
 import com.example.whatsappqueue.application.QueueService;
 import com.example.whatsappqueue.application.WhatsAppService;
+import com.example.whatsappqueue.application.dto.BusinessDto;
 import com.example.whatsappqueue.application.dto.QueueEntryDto;
-import com.example.whatsappqueue.common.exception.BusinessNotFoundException;
-import com.example.whatsappqueue.common.exception.QueueClosedException;
+import com.example.whatsappqueue.domain.Business;
 import com.example.whatsappqueue.infrastructure.persistence.BusinessRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -123,19 +123,6 @@ public class WhatsAppWebhookController {
             whatsAppService.sendJoinConfirmation(queueEntry);
             
             return "Join queue processed successfully";
-            
-        } catch (BusinessNotFoundException e) {
-            log.error("Business not found: {}", e.getMessage());
-            whatsAppService.sendQueueClosed(whatsappIdentifier, "Unknown Business");
-            return "Business not found";
-            
-        } catch (QueueClosedException e) {
-            log.error("Queue closed: {}", e.getMessage());
-            // Find business name to send proper notification
-            Optional<Business> business = businessRepository.findById(1L);
-            String businessName = business.map(Business::getName).orElse("the business");
-            whatsAppService.sendQueueClosed(whatsappIdentifier, businessName);
-            return "Queue closed";
             
         } catch (Exception e) {
             log.error("Error joining queue: {}", e.getMessage(), e);

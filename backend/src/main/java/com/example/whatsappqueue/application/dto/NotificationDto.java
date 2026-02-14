@@ -1,21 +1,23 @@
 package com.example.whatsappqueue.application.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 
 import com.example.whatsappqueue.domain.Notification;
 import com.example.whatsappqueue.domain.Notification.MessageType;
 
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class NotificationDto extends BaseDto {

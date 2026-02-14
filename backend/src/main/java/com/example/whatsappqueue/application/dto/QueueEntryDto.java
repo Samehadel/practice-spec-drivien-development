@@ -2,17 +2,21 @@ package com.example.whatsappqueue.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Data
+import com.example.whatsappqueue.domain.QueueEntry.Status;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class QueueEntryDto extends BaseDto {
@@ -25,11 +29,4 @@ public class QueueEntryDto extends BaseDto {
     private String metadata;
     private BusinessDto business;
     private Long waitTime;
-
-    public enum Status {
-        ACTIVE,
-        SERVED,
-        NO_SHOW,
-        LEFT
-    }
 }

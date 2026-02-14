@@ -107,10 +107,12 @@ whatsapp:
   api:
     version: v18.0
     base-url: https://graph.facebook.com
-    phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID}
-    access-token: ${WHATSAPP_ACCESS_TOKEN}
-    webhook-secret: ${WHATSAPP_WEBHOOK_SECRET}
+    access-token: access-token
+    webhook-secret: webhook-secret
     timeout: 10000
+    url: https://graph.facebook.com/v18.0
+    token: CTESD
+    phone-number-id: 101821266666666
 
 # Queue Configuration
 queue:

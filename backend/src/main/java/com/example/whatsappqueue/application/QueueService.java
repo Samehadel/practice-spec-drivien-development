@@ -1,9 +1,7 @@
 package com.example.whatsappqueue.application;
 
 import com.example.whatsappqueue.application.dto.QueueEntryDto;
-import com.example.whatsappqueue.common.exception.BusinessNotFoundException;
-import com.example.whatsappqueue.common.exception.QueueClosedException;
-import com.example.whatsappqueue.common.exception.QueueEntryNotFoundException;
+import com.example.whatsappqueue.common.exception.ExceptionService;
 import com.example.whatsappqueue.domain.Business;
 import com.example.whatsappqueue.domain.QueueEntry;
 import com.example.whatsappqueue.infrastructure.mapper.QueueEntryMapper;
@@ -32,10 +30,10 @@ public class QueueService {
         log.info("Customer {} attempting to join queue for business {}", whatsappIdentifier, businessId);
 
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(() -> new BusinessNotFoundException("Business not found with id: " + businessId));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.businessNotFoundException(businessId));
 
         if (!business.getQueueOpen()) {
-            throw new QueueClosedException("Queue is closed for business: " + business.getName());
+            throw ExceptionService.QueueExceptionBuilder.queueClosedException(business.getName());
         }
 
         // Check if customer is already in queue
@@ -68,7 +66,7 @@ public class QueueService {
     @Transactional(readOnly = true)
     public QueueEntryDto getQueueEntryStatus(Long queueEntryId) {
         QueueEntry queueEntry = queueEntryRepository.findById(queueEntryId)
-                .orElseThrow(() -> new QueueEntryNotFoundException("Queue entry not found with id: " + queueEntryId));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.queueEntryNotFoundException(queueEntryId));
 
         return queueEntryMapper.toDto(queueEntry);
     }
@@ -90,7 +88,7 @@ public class QueueService {
 
     public QueueEntryDto updateQueuePosition(Long queueEntryId, Integer newPosition) {
         QueueEntry queueEntry = queueEntryRepository.findById(queueEntryId)
-                .orElseThrow(() -> new QueueEntryNotFoundException("Queue entry not found with id: " + queueEntryId));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.queueEntryNotFoundException(queueEntryId));
 
         Integer oldPosition = queueEntry.getPosition();
         queueEntry.setPosition(newPosition);
@@ -103,7 +101,7 @@ public class QueueService {
 
     public QueueEntryDto markAsServed(Long queueEntryId) {
         QueueEntry queueEntry = queueEntryRepository.findById(queueEntryId)
-                .orElseThrow(() -> new QueueEntryNotFoundException("Queue entry not found with id: " + queueEntryId));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.queueEntryNotFoundException(queueEntryId));
 
         queueEntry.setStatus(QueueEntry.Status.SERVED);
         queueEntry.setServedAt(LocalDateTime.now());
@@ -120,7 +118,7 @@ public class QueueService {
 
     public QueueEntryDto markAsNoShow(Long queueEntryId) {
         QueueEntry queueEntry = queueEntryRepository.findById(queueEntryId)
-                .orElseThrow(() -> new QueueEntryNotFoundException("Queue entry not found with id: " + queueEntryId));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.queueEntryNotFoundException(queueEntryId));
 
         queueEntry.setStatus(QueueEntry.Status.NO_SHOW);
         queueEntry.setPosition(null);
@@ -137,7 +135,7 @@ public class QueueService {
     public QueueEntryDto leaveQueue(String whatsappIdentifier, Long businessId) {
         QueueEntry queueEntry = queueEntryRepository
                 .findByBusinessIdAndWhatsappIdentifierAndStatus(businessId, whatsappIdentifier, QueueEntry.Status.ACTIVE)
-                .orElseThrow(() -> new QueueEntryNotFoundException("Active queue entry not found for customer: " + whatsappIdentifier));
+                .orElseThrow(() -> ExceptionService.QueueExceptionBuilder.customerNotInQueueException(whatsappIdentifier));
 
         queueEntry.setStatus(QueueEntry.Status.LEFT);
         queueEntry.setPosition(null);
@@ -172,7 +170,7 @@ public class QueueService {
     @Transactional(readOnly = true)
     public Long getEstimatedWaitTime(Long businessId) {
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(() -> new BusinessNotFoundException("Business not found with id: " + businessId));
+                .orElseThrow(() -> ExceptionService.ResourceExceptionBuilder.resourceNotFoundException("Business", businessId));
 
         Integer queueLength = getQueueLength(businessId);
         return (long) (queueLength * business.getAverageServiceTimeMinutes());
