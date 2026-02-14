@@ -10,7 +10,9 @@ CREATE TABLE notifications (
     status VARCHAR(20) NOT NULL,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     delivered_at TIMESTAMP,
-    metadata JSONB
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 ALTER TABLE notifications ADD CONSTRAINT fk_notifications_business_id 
@@ -21,4 +23,3 @@ ALTER TABLE notifications ADD CONSTRAINT fk_notifications_queue_entry_id
 
 CREATE INDEX idx_notifications_business_id ON notifications(business_id);
 CREATE INDEX idx_notifications_queue_entry_id ON notifications(queue_entry_id);
-CREATE INDEX idx_notifications_status ON notifications(status);

@@ -10,15 +10,12 @@ CREATE TABLE queue_entries (
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     served_at TIMESTAMP,
     position INTEGER,
-    metadata JSONB
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 ALTER TABLE queue_entries ADD CONSTRAINT fk_queue_entries_business_id 
     FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE;
 
 CREATE INDEX idx_queue_entries_business_id ON queue_entries(business_id);
-CREATE INDEX idx_queue_entries_status ON queue_entries(status);
-CREATE INDEX idx_queue_entries_business_status ON queue_entries(business_id, status);
-CREATE INDEX idx_queue_entries_joined_at ON queue_entries(joined_at);
-CREATE UNIQUE INDEX idx_queue_entries_active_unique ON queue_entries(business_id, whatsapp_identifier) 
-    WHERE status = 'ACTIVE';
