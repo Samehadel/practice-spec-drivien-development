@@ -84,16 +84,16 @@ description: "Task list for WhatsApp Virtual Queue MVP implementation"
 - [x] T036 [US1] Create Liquibase migration for QueueEntry table in backend/src/main/resources/db/changelog/versions/DDL/002-create-queue-entries-table.sql
 - [x] T037 [US1] Create Liquibase migration for Notification table in backend/src/main/resources/db/changelog/versions/DDL/003-create-notifications-table.sql
 - [x] T038 [US1] Create Liquibase migration for QueueStateChange table in backend/src/main/resources/db/changelog/versions/DDL/004-create-queue-state-changes-table.sql
-- [ ] T039 [US1] Add validation and error handling for queue operations
-- [ ] T040 [US1] Add logging for user story 1 operations
-- [ ] T041 [US1] Configure Redis queue operations in backend/src/main/java/com/example/whatsappqueue/infrastructure/cache/
+- [x] T039 [US1] Add validation and error handling for queue operations
+- [x] T040 [US1] Add logging for user story 1 operations
+- [x] T041 [US1] Configure Redis queue operations in backend/src/main/java/com/example/whatsappqueue/infrastructure/cache/
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T019 [P] [US1] Unit test for Business entity in backend/src/test/java/com/example/whatsappqueue/domain/BusinessTest.java
-- [ ] T020 [P] [US1] Unit test for QueueEntry entity in backend/src/test/java/com/example/whatsappqueue/domain/QueueEntryTest.java
-- [ ] T021 [P] [US1] Integration test for WhatsApp webhook in backend/src/test/java/com/example/whatsappqueue/api/WhatsAppWebhookControllerTest.java
-- [ ] T022 [P] [US1] Contract test for join queue endpoint in backend/src/test/java/com/example/whatsappqueue/api/QueueControllerTest.java
+- [x] T019 [P] [US1] Unit test for Business entity in backend/src/test/java/com/example/whatsappqueue/domain/BusinessTest.java
+- [x] T020 [P] [US1] Unit test for QueueEntry entity in backend/src/test/java/com/example/whatsappqueue/domain/QueueEntryTest.java
+- [x] T021 [P] [US1] Integration test for WhatsApp webhook in backend/src/test/java/com/example/whatsappqueue/api/WhatsAppWebhookControllerTest.java
+- [x] T022 [P] [US1] Contract test for join queue endpoint in backend/src/test/java/com/example/whatsappqueue/api/QueueControllerTest.java
 - [ ] T023 [P] [US1] Unit tests for mappers in backend/src/test/java/com/example/whatsappqueue/infrastructure/mapper/
  
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
