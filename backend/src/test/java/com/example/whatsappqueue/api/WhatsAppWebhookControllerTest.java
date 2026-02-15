@@ -1,245 +1,283 @@
 package com.example.whatsappqueue.api;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.UUID;
+import com.example.whatsappqueue.application.WhatsAppService;
+import com.example.whatsappqueue.application.dto.QueueEntryDto;
+import com.example.whatsappqueue.domain.QueueEntry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.example.whatsappqueue.application.QueueService;
-import com.example.whatsappqueue.application.QueueValidationService;
-import com.example.whatsappqueue.application.WhatsAppService;
-import com.example.whatsappqueue.application.dto.BusinessDto;
-import com.example.whatsappqueue.application.dto.QueueEntryDto;
-import com.example.whatsappqueue.common.exception.ResourceAlreadyExistsException;
-import com.example.whatsappqueue.common.exception.ResourceNotFoundException;
-import com.example.whatsappqueue.common.exception.ValidationException;
-import com.example.whatsappqueue.domain.QueueEntry;
-import com.example.whatsappqueue.infrastructure.cache.QueueCacheService;
-import com.example.whatsappqueue.infrastructure.persistence.BusinessRepository;
-import com.example.whatsappqueue.infrastructure.persistence.QueueEntryRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 
-@DisplayName("WhatsApp Webhook Controller Integration Tests")
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@DisplayName("WhatsApp Webhook Integration Tests")
 class WhatsAppWebhookControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    
+
     @Mock
-    private QueueService queueService;
-    
-    @Mock
-    private WhatsAppService whatsappService;
-    
-    @Mock
-    private BusinessRepository businessRepository;
-    
-    @Mock
-    private QueueValidationService validationService;
-    
-    @Mock
-    private QueueCacheService cacheService;
-    
-    @Mock
-    private QueueEntryRepository queueEntryRepository;
-    
-    @Mock
+    private WhatsAppService whatsAppService;
+
     private ObjectMapper objectMapper;
-    
-    private BusinessDto testBusiness;
-    
+
     @BeforeEach
     void setUp() {
-        testBusiness = BusinessDto.builder()
-                .name("Test Restaurant")
-                .whatsappPhoneNumber("+1234567890")
-                .queueOpen(true)
-                .averageServiceTimeMinutes(15)
-                .notificationThreshold(3)
-                .build();
-        mockMvc = MockMvcBuilders.standaloneSetup(new WhatsAppWebhookController(whatsappService, queueService, businessRepository))
+        MockitoAnnotations.openMocks(this);
+        objectMapper = new ObjectMapper();
+        mockMvc = MockMvcBuilders.standaloneSetup(new WhatsAppWebhookController(whatsAppService))
                 .build();
     }
-    
+
     @Test
-    @DisplayName("Should process join message when queue is open")
-    void shouldProcessJoinMessageWhenQueueIsOpen() throws Exception {
+    @DisplayName("Should handle join queue webhook successfully")
+    void shouldHandleJoinQueueWebhookSuccessfully() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+1234567890\",\"id\":\"msg123\",\"text\":{\"body\":\"Hi\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any()))
-        .thenReturn(
-            QueueEntryDto.builder()
-                    .business(testBusiness)
-                    .whatsappIdentifier("+1234567890")
-                    .status(QueueEntry.Status.ACTIVE)
-                    .position(1)
-                    .joinedAt(any())
-                    .build()
-        );
-        
+        String webhookPayload = """
+            {
+                "object": "whatsapp_business_account",
+                "entry": [{
+                    "id": "123456789",
+                    "changes": [{
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "contacts": [{
+                                "wa_id": "+1234567890",
+                                "profile": {
+                                    "name": "John Doe"
+                                }
+                            }],
+                            "messages": [{
+                                "from": "+1234567890",
+                                "id": "msg123",
+                                "timestamp": "1707995600",
+                                "text": {
+                                    "body": "join queue"
+                                }
+                            }]
+                        }
+                    }]
+                }]
+            }
+            """;
+
+        QueueEntryDto expectedQueueEntry = QueueEntryDto.builder()
+                .whatsappIdentifier("+1234567890")
+                .customerName("John Doe")
+                .status(QueueEntry.Status.ACTIVE)
+                .position(1)
+                .build();
+
+        when(whatsAppService.processMessage(eq("+1234567890"), eq("join queue"), any()))
+                .thenReturn(expectedQueueEntry);
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("processed"))
-                .andExpect(jsonPath("$.message").value("Customer joined successfully"));
-    }
-    
-    @Test
-    @DisplayName("Should reject join message when queue is closed")
-    void shouldRejectJoinMessageWhenQueueIsClosed() throws Exception {
-        // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+1234567890\",\"id\":\"msg123\",\"text\":{\"body\":\"Hi\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any())).thenThrow(
-            new ValidationException("Queue is currently closed for business: " + testBusiness.getName())
-        );
-        
-        // When
-        mockMvc.perform(post("/webhooks/whatsapp")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
+                .content(webhookPayload))
+                .andExpect(status().isOk());
+
         // Then
-        .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("ignored"))
-                .andExpect(jsonPath("$.message").value("Queue is currently closed"));
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> senderCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Map<String, Object>> metadataCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(whatsAppService).processMessage(
+                senderCaptor.capture(),
+                messageCaptor.capture(),
+                metadataCaptor.capture());
+
+        assertThat(senderCaptor.getValue()).isEqualTo("+1234567890");
+        assertThat(messageCaptor.getValue()).isEqualTo("join queue");
+        assertThat(metadataCaptor.getValue()).isNotEmpty();
     }
-    
+
     @Test
-    @DisplayName("Should handle duplicate join request")
-    void shouldHandleDuplicateJoinRequest() throws Exception {
+    @DisplayName("Should handle leave queue webhook successfully")
+    void shouldHandleLeaveQueueWebhookSuccessfully() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+1234567890\",\"id\":\"msg124\",\"text\":{\"body\":\"Hi\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any())).thenThrow(
-            new ResourceAlreadyExistsException("Customer already in queue with +1234567890")
-        );
-        
+        String webhookPayload = """
+            {
+                "object": "whatsapp_business_account",
+                "entry": [{
+                    "id": "123456789",
+                    "changes": [{
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "contacts": [{
+                                "wa_id": "+1234567890",
+                                "profile": {
+                                    "name": "John Doe"
+                                }
+                            }],
+                            "messages": [{
+                                "from": "+1234567890",
+                                "id": "msg124",
+                                "timestamp": "1707995600",
+                                "text": {
+                                    "body": "leave queue"
+                                }
+                            }]
+                        }
+                    }]
+                }]
+            }
+            """;
+
+        when(whatsAppService.processMessage(eq("+1234567890"), eq("leave queue"), any()))
+                .thenReturn(null);
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
+                .content(webhookPayload))
+                .andExpect(status().isOk());
+
         // Then
-        .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("processed"))
-                .andExpect(jsonPath("$.message").value("Customer is already in queue"));
+        verify(whatsAppService).processMessage(
+                eq("+1234567890"),
+                eq("leave queue"),
+                any());
     }
-    
+
     @Test
-    @DisplayName("Should handle invalid message format")
-    void shouldHandleInvalidMessageFormat() throws Exception {
+    @DisplayName("Should handle status check webhook successfully")
+    void shouldHandleStatusCheckWebhookSuccessfully() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"invalid\",\"id\":\"msg125\",\"text\":{\"body\":\"Invalid\"}}]}";
-        
+        String webhookPayload = """
+            {
+                "object": "whatsapp_business_account",
+                "entry": [{
+                    "id": "123456789",
+                    "changes": [{
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "contacts": [{
+                                "wa_id": "+1234567890",
+                                "profile": {
+                                    "name": "John Doe"
+                                }
+                            }],
+                            "messages": [{
+                                "from": "+1234567890",
+                                "id": "msg125",
+                                "timestamp": "1707995600",
+                                "text": {
+                                    "body": "status"
+                                }
+                            }]
+                        }
+                    }]
+                }]
+            }
+            """;
+
+        QueueEntryDto expectedQueueEntry = QueueEntryDto.builder()
+                .whatsappIdentifier("+1234567890")
+                .customerName("John Doe")
+                .status(QueueEntry.Status.ACTIVE)
+                .position(3)
+                .waitTime(15L)
+                .build();
+
+        when(whatsAppService.processMessage(eq("+1234567890"), eq("status"), any()))
+                .thenReturn(expectedQueueEntry);
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
+                .content(webhookPayload))
+                .andExpect(status().isOk());
+
         // Then
-        .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("ignored"))
-                .andExpect(jsonPath("$.message").exists());
+        verify(whatsAppService).processMessage(
+                eq("+1234567890"),
+                eq("status"),
+                any());
     }
-    
+
     @Test
-    @DisplayName("Should handle business not found error")
-    void shouldHandleBusinessNotFoundError() throws Exception {
+    @DisplayName("Should handle invalid webhook payload gracefully")
+    void shouldHandleInvalidWebhookPayloadGracefully() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+9999999999\",\"id\":\"msg126\",\"text\":{\"body\":\"Hi\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any()))
-        .thenThrow(
-            new ResourceNotFoundException("Business not found")
-        );
-        
+        String invalidPayload = """
+            {
+                "object": "invalid_object",
+                "entry": []
+            }
+            """;
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
+                .content(invalidPayload))
+                .andExpect(status().isOk());
+
         // Then
-        .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("ignored"))
-                .andExpect(jsonPath("$.message").exists());
+        verify(whatsAppService, never()).processMessage(any(), any(), any());
     }
-    
+
     @Test
-    @DisplayName("Should handle validation exception")
-    void shouldHandleValidationException() throws Exception {
+    @DisplayName("Should handle webhook verification challenge")
+    void shouldHandleWebhookVerificationChallenge() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+1234567890\",\"id\":\"msg127\",\"text\":{\"body\":\"\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any())).thenThrow(
-            new ValidationException("Invalid message format")
-        );
-        
+        String challengePayload = """
+            {
+                "hub.mode": "subscribe",
+                "hub.verify_token": "test_token",
+                "hub.challenge": "challenge123"
+            }
+            """;
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
-        // Then
-        .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("ignored"))
-                .andExpect(jsonPath("$.message").exists());
+                .content(challengePayload))
+                .andExpect(status().isOk())
+                .andExpect(content().string("challenge123"));
     }
-    
+
     @Test
-    @DisplayName("Should handle internal server error")
-    void shouldHandleInternalServerError() throws Exception {
+    @DisplayName("Should handle webhook with no messages")
+    void shouldHandleWebhookWithNoMessages() throws Exception {
         // Given
-        String whatsappMessage = "{\"object\":\"user\",\"entry\":[{\"changes\":[{\"field\":\"messaging\",\"value\":{\"messaging_product\":\"whatsapp\"}}],\"messages\":[{\"from\":\"+1234567890\",\"id\":\"msg128\",\"text\":{\"body\":\"Hi\"}}]}";
-        
-        when(queueService.joinQueue(any(), any(), any())).thenThrow(
-            new RuntimeException("Database connection failed")
-        );
-        
+        String noMessagesPayload = """
+            {
+                "object": "whatsapp_business_account",
+                "entry": [{
+                    "id": "123456789",
+                    "changes": [{
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "contacts": [],
+                            "messages": []
+                        }
+                    }]
+                }]
+            }
+            """;
+
         // When
-        mockMvc.perform(post("/webhooks/whatsapp")
+        mockMvc.perform(post("/webhook/whatsapp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(whatsappMessage)
-                .header("X-Hub-Signature", "test-signature")
-        )
-        
+                .content(noMessagesPayload))
+                .andExpect(status().isOk());
+
         // Then
-        .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("ignored"))
-                .andExpect(jsonPath("$.message").exists());
+        verify(whatsAppService, never()).processMessage(any(), any(), any());
     }
 }

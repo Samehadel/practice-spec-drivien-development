@@ -35,12 +35,15 @@ public class Business extends BaseEntity {
     private String whatsappPhoneNumber;
 
     @Column(name = "queue_open", nullable = false)
+    @Builder.Default
     private Boolean queueOpen = true;
 
     @Column(name = "average_service_time_minutes", nullable = false)
+    @Builder.Default
     private Integer averageServiceTimeMinutes = 10;
 
     @Column(name = "notification_threshold", nullable = false)
+    @Builder.Default
     private Integer notificationThreshold = 3;
 
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

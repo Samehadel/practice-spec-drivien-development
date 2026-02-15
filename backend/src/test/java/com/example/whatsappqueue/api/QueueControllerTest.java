@@ -164,7 +164,7 @@ class QueueControllerTest {
                 .andExpect(jsonPath("$.servedEntry.id").value(queueEntryId.toString()))
                 .andExpect(jsonPath("$.servedEntry.status").value("SERVED"))
                 .andExpect(jsonPath("$.nextEntry").exists())
-                .andExpect(jsonPath("$.nextEntry.whatsappIdentifier").value("+1234567890"));
+                .andExpect(jsonPath("$.nextEntry.whatsappIdentifier").value("+1234567890"))
                 .andExpect(jsonPath("$.nextEntry.position").value(1));
     }
     
